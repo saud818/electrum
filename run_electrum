@@ -45,6 +45,7 @@ is_bundle = getattr(sys, 'frozen', False)
 is_local = not is_bundle and os.path.exists(os.path.join(script_dir, "electrum.desktop"))
 is_android = 'ANDROID_DATA' in os.environ
 
+
 if is_local:  # running from source
     # developers should probably see all deprecation warnings.
     warnings.simplefilter('default', DeprecationWarning)
@@ -312,12 +313,14 @@ def main():
 
     # config is an object passed to the various constructors (wallet, interface, gui)
     if is_android:
+        import importlib
+        android_gui = 'kivy' if importlib.find_loader('kivy') else 'qml'
         from jnius import autoclass
         build_config = autoclass("org.electrum.electrum.BuildConfig")
         config_options = {
             'verbosity': '*', #if build_config.DEBUG else '',
             'cmd': 'gui',
-            'gui': 'qml',
+            'gui': android_gui,
             'single_password':True,
         }
     else:
